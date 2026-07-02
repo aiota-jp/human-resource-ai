@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}評価管理 - AI人事・研修システム{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>📊 評価管理</h1>
+  <a href="{{ url_for('export_excel') }}" class="btn btn-secondary">Excel出力</a>
+</div>
+<table class="table">
+  <thead><tr><th>社員番号</th><th>氏名</th><th>部署</th><th>出席率</th><th>理解度</th><th>課題</th><th>総合</th><th>AIコメント</th><th>操作</th></tr></thead>
+  <tbody>
+  {% for ev in evaluations %}
+    <tr>
+      <td>{{ ev.employee_no }}</td><td>{{ ev.name }}</td><td>{{ ev.department }}</td>
+      <td>{{ ev.attendance_rate }}</td><td>{{ ev.understanding_level }}</td><td>{{ ev.report_score }}</td>
+      <td><strong>{{ ev.score or ev.calculated_score }}</strong></td>
+      <td class="comment-cell">{{ ev.ai_comment or '未生成' }}</td>
+      <td>
+        <form method="POST" action="{{ url_for('evaluation_generate', employee_id=ev.employee_id) }}">
+          <button class="btn btn-small btn-primary" type="submit">AI生成</button>
+        </form>
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="9" class="text-center">評価対象の社員がありません。</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

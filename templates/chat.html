@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}FAQチャット - AI人事・研修システム{% endblock %}
+{% block content %}
+<div class="page-header"><h1>💬 FAQチャット</h1></div>
+<div class="chat-box">
+  {% for m in messages %}
+    <div class="chat-message {{ m.role }}"><div class="bubble">{{ m.text }}</div></div>
+  {% else %}
+    <p class="text-center muted">質問を入力すると回答が表示されます。</p>
+  {% endfor %}
+</div>
+<form method="POST" class="chat-form">
+  <input type="text" name="message" placeholder="例: 有給休暇の申請方法は？" required>
+  <button class="btn btn-primary" type="submit">送信</button>
+</form>
+{% endblock %}

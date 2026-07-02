@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}ダッシュボード - AI人事・研修システム{% endblock %}
+
+{% block content %}
+<h1>ダッシュボード</h1>
+<p>メニューから機能を選択してください。</p>
+
+<div class="dashboard-grid">
+
+  <a href="{{ url_for('employee_list') }}" class="dashboard-card">
+    <span class="card-icon">👤</span>
+    <h2>社員管理</h2>
+    <p>社員情報の登録・更新・検索</p>
+  </a>
+
+  <a href="{{ url_for('training_list') }}" class="dashboard-card">
+    <span class="card-icon">📚</span>
+    <h2>研修管理</h2>
+    <p>研修登録・出席・理解度管理</p>
+  </a>
+
+  <a href="{{ url_for('evaluation_list') }}" class="dashboard-card">
+    <span class="card-icon">📊</span>
+    <h2>評価管理</h2>
+    <p>評価集計・AIコメント生成</p>
+  </a>
+
+  <a href="{{ url_for('import_excel') }}" class="dashboard-card">
+    <span class="card-icon">📥</span>
+    <h2>Excel取込</h2>
+    <p>社員台帳・研修結果のインポート</p>
+  </a>
+
+  <a href="{{ url_for('export_excel') }}" class="dashboard-card">
+    <span class="card-icon">📤</span>
+    <h2>Excel出力</h2>
+    <p>評価シート・集計結果の出力</p>
+  </a>
+
+  <a href="{{ url_for('search') }}" class="dashboard-card">
+    <span class="card-icon">🔍</span>
+    <h2>文書検索</h2>
+    <p>社内規則・マニュアルをAIで検索</p>
+  </a>
+
+  <a href="{{ url_for('chat') }}" class="dashboard-card">
+    <span class="card-icon">💬</span>
+    <h2>FAQチャット</h2>
+    <p>よくある質問に自動回答</p>
+  </a>
+
+  <a href="{{ url_for('report_list') }}" class="dashboard-card">
+    <span class="card-icon">📝</span>
+    <h2>日報管理</h2>
+    <p>日報・週報の登録・確認</p>
+  </a>
+
+</div>
+{% endblock %}

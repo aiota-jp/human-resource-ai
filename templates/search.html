@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}社内文書検索 - AI人事・研修システム{% endblock %}
+{% block content %}
+<div class="page-header"><h1>🔍 社内文書検索</h1></div>
+<form method="POST" class="search-form wide">
+  <input type="text" name="question" value="{{ question }}" placeholder="例: テレワーク申請のルールを教えて" required>
+  <button class="btn btn-primary" type="submit">検索</button>
+</form>
+{% if result %}
+  {% if result.error %}<div class="alert alert-warning">{{ result.error }}</div>{% endif %}
+  <div class="result-list">
+    {% for rec in result.records %}
+      <article class="card result-card"><h3>{{ rec.title }}</h3><p>{{ rec.content }}</p><span class="badge">score: {{ rec.score }}</span></article>
+    {% else %}<p class="text-center muted">検索結果がありません。</p>{% endfor %}
+  </div>
+{% endif %}
+{% endblock %}

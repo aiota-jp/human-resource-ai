@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}AI人事・研修業務支援システム{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+  <!-- ナビゲーションバー -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a href="{{ url_for('index') }}">🏢 AI人事・研修システム</a>
+    </div>
+    <ul class="navbar-menu">
+      <li><a href="{{ url_for('employee_list') }}">社員管理</a></li>
+      <li><a href="{{ url_for('training_list') }}">研修管理</a></li>
+      <li><a href="{{ url_for('evaluation_list') }}">評価管理</a></li>
+      <li><a href="{{ url_for('import_excel') }}">Excel取込</a></li>
+      <li><a href="{{ url_for('report_list') }}">日報</a></li>
+      <li><a href="{{ url_for('search') }}">文書検索</a></li>
+      <li><a href="{{ url_for('chat') }}">FAQチャット</a></li>
+      <li><a href="{{ url_for('logout') }}">ログアウト</a></li>
+    </ul>
+  </nav>
+
+  <!-- メインコンテンツ -->
+  <main class="container">
+
+    <!-- フラッシュメッセージ -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+
+  </main>
+
+  <footer class="footer">
+    <p>AI人事・研修業務支援システム &copy; 2024</p>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
