@@ -14,10 +14,12 @@
       <a href="{{ url_for('index') }}">🏢 AI人事・研修システム</a>
     </div>
     <ul class="navbar-menu">
+      {% if session.get('role') in ['staff', 'admin'] %}
       <li><a href="{{ url_for('employee_list') }}">社員管理</a></li>
       <li><a href="{{ url_for('training_list') }}">研修管理</a></li>
       <li><a href="{{ url_for('evaluation_list') }}">評価管理</a></li>
       <li><a href="{{ url_for('import_excel') }}">Excel取込</a></li>
+      {% endif %}
       <li><a href="{{ url_for('report_list') }}">日報</a></li>
       <li><a href="{{ url_for('search') }}">文書検索</a></li>
       <li><a href="{{ url_for('chat') }}">FAQチャット</a></li>

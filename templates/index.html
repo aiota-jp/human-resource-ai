@@ -7,6 +7,7 @@
 
 <div class="dashboard-grid">
 
+  {% if session.get('role') in ['staff', 'admin'] %}
   <a href="{{ url_for('employee_list') }}" class="dashboard-card">
     <span class="card-icon">👤</span>
     <h2>社員管理</h2>
@@ -36,6 +37,8 @@
     <h2>Excel出力</h2>
     <p>評価シート・集計結果の出力</p>
   </a>
+
+  {% endif %}
 
   <a href="{{ url_for('search') }}" class="dashboard-card">
     <span class="card-icon">🔍</span>

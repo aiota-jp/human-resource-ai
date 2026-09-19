@@ -5,7 +5,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from werkzeug.utils import secure_filename
 from config import Config
 from database import init_db
-from services.auth_service import authenticate, ensure_default_admin, login_required
+from services.auth_service import authenticate, ensure_default_users, login_required, roles_required
 from services.employee_service import get_all_employees, get_employee_by_id, create_employee, update_employee, delete_employee
 from services.training_service import get_all_trainings, get_training_by_id, create_training, get_training_histories, upsert_training_history
 from services.evaluation_service import get_evaluation_targets, save_evaluation
@@ -19,7 +19,7 @@ app.config.from_object(Config)
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 os.makedirs(app.config["OUTPUT_FOLDER"], exist_ok=True)
 init_db()
-ensure_default_admin()
+ensure_default_users()
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -51,6 +51,7 @@ def index():
 
 @app.route("/employees")
 @login_required
+@roles_required("staff", "admin")
 def employee_list():
     keyword = request.args.get("keyword", "")
     return render_template("employee_list.html", employees=get_all_employees(keyword))
@@ -58,6 +59,7 @@ def employee_list():
 
 @app.route("/employees/new", methods=["GET", "POST"])
 @login_required
+@roles_required("staff", "admin")
 def employee_new():
     if request.method == "POST":
         create_employee(request.form.to_dict())
@@ -68,6 +70,7 @@ def employee_new():
 
 @app.route("/employees/<int:employee_id>/edit", methods=["GET", "POST"])
 @login_required
+@roles_required("staff", "admin")
 def employee_edit(employee_id):
     employee = get_employee_by_id(employee_id)
     if not employee:
@@ -82,6 +85,7 @@ def employee_edit(employee_id):
 
 @app.route("/employees/<int:employee_id>/delete", methods=["POST"])
 @login_required
+@roles_required("admin")
 def employee_delete(employee_id):
     delete_employee(employee_id)
     flash("社員を削除しました", "success")
@@ -90,12 +94,14 @@ def employee_delete(employee_id):
 
 @app.route("/trainings")
 @login_required
+@roles_required("staff", "admin")
 def training_list():
     return render_template("training_list.html", trainings=get_all_trainings())
 
 
 @app.route("/trainings/new", methods=["GET", "POST"])
 @login_required
+@roles_required("staff", "admin")
 def training_new():
     if request.method == "POST":
         create_training(request.form.to_dict())
@@ -106,6 +112,7 @@ def training_new():
 
 @app.route("/trainings/<int:training_id>/history", methods=["GET", "POST"])
 @login_required
+@roles_required("staff", "admin")
 def training_history(training_id):
     training = get_training_by_id(training_id)
     if not training:
@@ -125,12 +132,14 @@ def training_history(training_id):
 
 @app.route("/evaluations")
 @login_required
+@roles_required("staff", "admin")
 def evaluation_list():
     return render_template("evaluation.html", evaluations=get_evaluation_targets())
 
 
 @app.route("/evaluations/<int:employee_id>/generate", methods=["POST"])
 @login_required
+@roles_required("staff", "admin")
 def evaluation_generate(employee_id):
     target = next((e for e in get_evaluation_targets() if e["employee_id"] == employee_id), None)
     if not target:
@@ -146,6 +155,7 @@ def evaluation_generate(employee_id):
 
 @app.route("/import", methods=["GET", "POST"])
 @login_required
+@roles_required("staff", "admin")
 def import_excel():
     trainings = get_all_trainings()
     if request.method == "POST":
@@ -172,6 +182,7 @@ def import_excel():
 
 @app.route("/export")
 @login_required
+@roles_required("staff", "admin")
 def export_excel():
     output_path = os.path.join(app.config["OUTPUT_FOLDER"], f"evaluation_{date.today().isoformat()}.xlsx")
     export_evaluation_excel(get_evaluation_targets(), output_path)
