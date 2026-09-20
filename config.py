@@ -29,4 +29,3 @@ class Config:
     # Dify設定
     DIFY_API_KEY = os.getenv("DIFY_API_KEY", "")
     DIFY_API_URL = os.getenv("DIFY_API_URL", "https://api.dify.ai/v1")
-    DIFY_DATASET_ID = os.getenv("DIFY_DATASET_ID", "")

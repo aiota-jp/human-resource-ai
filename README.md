@@ -53,3 +53,10 @@ python app.py
 - CSS / JavaScript
 
 Difyを使う場合は `.env` に `DIFY_API_KEY` を設定してください。未設定の場合はローカル確認用のダミー回答で動作します。
+
+
+## DB初期化手順(PowerShellで以下を実行)
+ - Remove-Item .\database.db
+ - python create_admin.py
+
+
