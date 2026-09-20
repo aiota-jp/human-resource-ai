@@ -10,5 +10,5 @@ def search_documents(question: str) -> dict:
 
 def send_chat_message(message: str, conversation_id: str = "") -> dict:
     if not message.strip():
-        return {"answer": "メッセージを入力してください。", "conversation_id": conversation_id}
+        return {"success": False, "answer": "", "conversation_id": conversation_id, "error": "メッセージを入力してください"}
     return chat_with_faq(message, conversation_id)

@@ -69,3 +69,8 @@ textarea{resize:vertical}
 .bubble{max-width:92%}
 }
 
+
+.chat-box{max-height:560px;overflow-y:auto;scroll-behavior:smooth}
+.chat-message.assistant{justify-content:flex-start}
+.chat-message.loading .bubble{color:#607d8b;font-style:italic}
+.chat-form button:disabled,.chat-form input:disabled{opacity:.65;cursor:not-allowed}

@@ -76,22 +76,71 @@ def search_knowledge(question: str, top_k: int = 3) -> dict:
 
 
 def chat_with_faq(message: str, conversation_id: str = "") -> dict:
+    """FAQチャットボットへ問い合わせ、回答と会話IDを返す。"""
     if not Config.DIFY_API_KEY:
         return {
-            "answer": "現在はローカル確認モードです。.env に DIFY_API_KEY を設定するとFAQチャットが利用できます。",
+            "success": False,
+            "answer": "",
             "conversation_id": conversation_id,
+            "error": "DIFY_API_KEY が設定されていません（.env を確認してください）",
         }
+
     payload = {
         "inputs": {},
         "query": message,
         "response_mode": "blocking",
-        "conversation_id": conversation_id,
         "user": "human-resource-app",
     }
+
+    # 2回目以降は同じ conversation_id を送り、会話の文脈を保持する
+    if conversation_id:
+        payload["conversation_id"] = conversation_id
+
     try:
-        res = requests.post(f"{Config.DIFY_API_URL}/chat-messages", headers=_headers(), json=payload, timeout=30)
+        res = requests.post(
+            f"{Config.DIFY_API_URL}/chat-messages",
+            headers=_headers(),
+            json=payload,
+            timeout=30,
+        )
         res.raise_for_status()
         data = res.json()
-        return {"answer": data.get("answer", ""), "conversation_id": data.get("conversation_id", conversation_id)}
+        answer = data.get("answer", "").strip()
+
+        if not answer:
+            return {
+                "success": False,
+                "answer": "",
+                "conversation_id": data.get("conversation_id", conversation_id),
+                "error": "AIからの回答が空でした",
+            }
+
+        return {
+            "success": True,
+            "answer": answer,
+            "conversation_id": data.get("conversation_id", conversation_id),
+            "error": "",
+        }
+
+    except requests.exceptions.Timeout:
+        return {
+            "success": False,
+            "answer": "",
+            "conversation_id": conversation_id,
+            "error": "Dify APIへのリクエストがタイムアウトしました",
+        }
+    except requests.exceptions.ConnectionError:
+        return {
+            "success": False,
+            "answer": "",
+            "conversation_id": conversation_id,
+            "error": "Dify APIに接続できません",
+        }
     except requests.RequestException as exc:
-        return {"answer": "FAQチャットの呼び出しでエラーが発生しました。", "error": str(exc), "conversation_id": conversation_id}
+        return {
+            "success": False,
+            "answer": "",
+            "conversation_id": conversation_id,
+            "error": f"FAQチャットの呼び出しでエラーが発生しました: {exc}",
+        }
+

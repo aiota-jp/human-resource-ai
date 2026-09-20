@@ -1,7 +1,7 @@
 """Flaskアプリケーション エントリーポイント"""
 import os
 from datetime import date
-from flask import Flask, render_template, request, redirect, url_for, session, flash, send_file
+from flask import Flask, render_template, request, redirect, url_for, session, flash, send_file, jsonify
 from werkzeug.utils import secure_filename
 from config import Config
 from database import init_db
@@ -216,19 +216,31 @@ def search():
     return render_template("search.html", result=result, question=question)
 
 
-@app.route("/chat", methods=["GET", "POST"])
+@app.route("/chat")
 @login_required
 def chat():
-    messages = session.get("chat_messages", [])
-    if request.method == "POST":
-        message = request.form.get("message", "")
-        response = send_chat_message(message, session.get("conversation_id", ""))
-        session["conversation_id"] = response.get("conversation_id", "")
-        messages.append({"role": "user", "text": message})
-        messages.append({"role": "assistant", "text": response.get("answer", "")})
-        session["chat_messages"] = messages[-20:]
-        return redirect(url_for("chat"))
-    return render_template("chat.html", messages=messages)
+    """FAQチャット画面"""
+    return render_template("chat.html")
+
+
+@app.route("/chat/send", methods=["POST"])
+@login_required
+def chat_send():
+    """FAQチャットのメッセージ送信API"""
+    data = request.get_json(silent=True) or {}
+    message = data.get("message", "").strip()
+    conversation_id = data.get("conversation_id", "")
+
+    if not message:
+        return jsonify({
+            "success": False,
+            "answer": "",
+            "conversation_id": conversation_id,
+            "error": "メッセージを入力してください",
+        })
+
+    result = send_chat_message(message, conversation_id)
+    return jsonify(result)
 
 
 if __name__ == "__main__":
