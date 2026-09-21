@@ -18,8 +18,10 @@ python app.py
 | `admin` | `password` | admin |
 | `staff` | `password` | staff |
 | `user` | `password` | user |
+| `EMP001` | `password` | user（山田 太郎） |
 
-既存DBを利用している場合も、アプリ起動時に存在しない `staff` / `user` が自動追加されます。既存ユーザーのパスワードやロールは変更しません。
+`EMP001`でログインすると、山田太郎本人の社員情報・研修履歴・評価・日報だけを表示するマイページへ移動します。
+既存DBを利用している場合も、アプリ起動時に存在しない初期ユーザーが自動追加されます。既存ユーザーのパスワードやロールは変更しません。
 
 ## ロール別アクセス権限
 
@@ -50,6 +52,7 @@ python app.py
 - FAQチャット
 - ログイン認証
 - ロール別認可（user / staff / admin）
+- 社員番号ログインと社員本人用マイページ
 - CSS / JavaScript
 
 Difyを使う場合は `.env` に `DIFY_API_KEY` を設定してください。未設定の場合はローカル確認用のダミー回答で動作します。
@@ -58,5 +61,4 @@ Difyを使う場合は `.env` に `DIFY_API_KEY` を設定してください。�
 ## DB初期化手順(PowerShellで以下を実行)
  - Remove-Item .\database.db
  - python create_admin.py
-
 

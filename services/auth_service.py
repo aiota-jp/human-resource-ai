@@ -9,6 +9,7 @@ DEFAULT_USERS = (
     ("admin", "password", "admin"),
     ("staff", "password", "staff"),
     ("user", "password", "user"),
+    ("EMP001", "password", "user"),
 )
 
 
@@ -35,7 +36,16 @@ def ensure_default_admin() -> None:
 
 def authenticate(username: str, password: str) -> dict | None:
     conn = get_db()
-    user = conn.execute("SELECT * FROM user WHERE username = ?", (username,)).fetchone()
+    user = conn.execute(
+        """
+        SELECT u.*, e.id AS employee_id, e.name AS employee_name
+          FROM user u
+          LEFT JOIN employee e
+                 ON e.employee_no = u.username AND e.is_active = 1
+         WHERE u.username = ?
+        """,
+        (username,),
+    ).fetchone()
     conn.close()
     if user and check_password_hash(user["password"], password):
         return dict(user)

@@ -13,6 +13,7 @@ from services.dify_service import generate_evaluation_comment
 from services.excel_service import allowed_file, import_employee_excel, import_training_excel, export_evaluation_excel
 from services.report_service import get_reports, create_report
 from services.search_service import search_documents, send_chat_message
+from services.employee_portal_service import get_employee_portal_data
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -30,7 +31,11 @@ def login():
             session["user_id"] = user["id"]
             session["username"] = user["username"]
             session["role"] = user["role"]
+            session["employee_id"] = user.get("employee_id")
+            session["employee_name"] = user.get("employee_name")
             flash("ログインしました", "success")
+            if user.get("employee_id"):
+                return redirect(url_for("employee_portal"))
             return redirect(url_for("index"))
         flash("ユーザーIDまたはパスワードが違います", "danger")
     return render_template("login.html")
@@ -46,7 +51,40 @@ def logout():
 @app.route("/")
 @login_required
 def index():
-    return render_template("index.html")
+    if session.get("employee_id"):
+        return redirect(url_for("employee_portal"))
+    dashboard_stats = {
+        "employee_count": 0,
+        "training_count": 0,
+        "evaluation_count": 0,
+        "role": session.get("role", "user"),
+    }
+    if session.get("role") in ("staff", "admin"):
+        employees = get_all_employees()
+        trainings = get_all_trainings()
+        evaluations = get_evaluation_targets()
+        dashboard_stats.update({
+            "employee_count": len(employees),
+            "training_count": len(trainings),
+            "evaluation_count": sum(1 for item in evaluations if item.get("ai_comment")),
+        })
+    return render_template("index.html", dashboard_stats=dashboard_stats)
+
+
+@app.route("/my-page")
+@login_required
+def employee_portal():
+    """社員番号でログインした社員専用のマイページ。"""
+    employee_id = session.get("employee_id")
+    if not employee_id:
+        flash("社員専用画面を利用できるアカウントではありません", "warning")
+        return redirect(url_for("index"))
+    portal = get_employee_portal_data(int(employee_id))
+    if not portal:
+        session.clear()
+        flash("社員情報が見つかりません。管理者にお問い合わせください", "danger")
+        return redirect(url_for("login"))
+    return render_template("employee_portal.html", portal=portal)
 
 
 @app.route("/employees")
@@ -134,7 +172,15 @@ def training_history(training_id):
 @login_required
 @roles_required("staff", "admin")
 def evaluation_list():
-    return render_template("evaluation.html", evaluations=get_evaluation_targets())
+    evaluations = get_evaluation_targets()
+    count = len(evaluations)
+    evaluation_stats = {
+        "target_count": count,
+        "attendance_average": round(sum(float(item.get("attendance_rate") or 0) for item in evaluations) / count, 1) if count else 0,
+        "understanding_average": round(sum(float(item.get("understanding_level") or 0) for item in evaluations) / count, 1) if count else 0,
+        "generated_count": sum(1 for item in evaluations if item.get("ai_comment")),
+    }
+    return render_template("evaluation.html", evaluations=evaluations, evaluation_stats=evaluation_stats)
 
 
 @app.route("/evaluations/<int:employee_id>/generate", methods=["POST"])
@@ -192,11 +238,22 @@ def export_excel():
 @app.route("/reports", methods=["GET", "POST"])
 @login_required
 def report_list():
+    employee_id = session.get("employee_id")
     if request.method == "POST":
-        create_report(request.form.to_dict())
+        report_data = request.form.to_dict()
+        if employee_id:
+            report_data["employee_id"] = str(employee_id)
+        create_report(report_data)
         flash("日報を登録しました", "success")
         return redirect(url_for("report_list"))
-    return render_template("report.html", reports=get_reports(), employees=get_all_employees(), today=date.today().isoformat())
+    employees = [get_employee_by_id(int(employee_id))] if employee_id else get_all_employees()
+    return render_template(
+        "report.html",
+        reports=get_reports(int(employee_id)) if employee_id else get_reports(),
+        employees=employees,
+        today=date.today().isoformat(),
+        employee_mode=bool(employee_id),
+    )
 
 
 @app.route("/reports/new")
