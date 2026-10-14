@@ -5,10 +5,14 @@
 <section class="page-card rag-page">
   <h2>🔍 社内文書検索（RAG）</h2>
   <p class="lead">知りたい内容を自然な文章で入力してください。関連する社内文書をもとに回答します。</p>
-  <form method="POST" class="rag-search-box">
-    <div class="rag-search-row"><input type="text" name="question" value="{{ question }}" placeholder="例：テレワーク申請のルールを教えてください" required><button class="btn btn-primary" type="submit">検索</button></div>
+  <form method="POST" class="rag-search-box" id="rag-search-form">
+    <div class="rag-search-row"><input type="text" name="question" value="{{ question }}" placeholder="例：テレワーク申請のルールを教えてください" required><button class="btn btn-primary" type="submit" id="rag-search-submit"><span class="rag-submit-label">検索</span></button></div>
     <p class="help-text">例：評価基準を教えてください ／ 有給休暇の申請方法は？ ／ 研修レポートの提出方法は？</p>
   </form>
+  <div id="rag-loading-status" class="rag-loading-status" role="status" aria-live="polite" hidden>
+    <span class="loading-spinner rag-loading-spinner" aria-hidden="true"></span>
+    <div><strong>検索中です…</strong><p>社内文書を検索しています。回答が表示されるまでお待ちください。</p></div>
+  </div>
   {% if result %}
     {% if result.error %}<div class="alert alert-warning">{{ result.error }}</div>{% endif %}
     <h2 class="result-title">検索結果</h2>

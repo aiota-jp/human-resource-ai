@@ -16,3 +16,11 @@ a{color:inherit}.app-shell{display:flex;min-height:100vh}.sidebar{position:fixed
 .chat-box{padding:18px;min-height:320px;max-height:560px;overflow-y:auto;scroll-behavior:smooth}.chat-message{display:flex;margin:10px 0}.chat-message.user{justify-content:flex-end}.chat-message.assistant{justify-content:flex-start}.bubble{max-width:70%;padding:11px 14px;border-radius:16px;background:#eef2f7}.chat-message.user .bubble{background:var(--blue);color:#fff}.chat-message.loading .bubble{color:#607d8b;font-style:italic}.chat-form{display:flex;gap:10px;margin-top:12px}.chat-form input{flex:1}.chat-form button:disabled,.chat-form input:disabled{opacity:.65;cursor:not-allowed}
 @media(max-width:980px){.kpi-grid,.summary-grid{grid-template-columns:repeat(2,1fr)}.sidebar{transform:translateX(-100%);transition:.2s}.workspace{width:100%;margin-left:0}.menu-toggle{display:block}.sidebar-open .sidebar{transform:translateX(0)}.sidebar-open:after{content:"";position:fixed;inset:0;background:rgba(15,23,42,.35);z-index:15}}
 @media(max-width:700px){.main-content{padding:20px 16px}.topbar{padding:0 16px}.user-pill span:first-child{display:none}.content-header,.page-title-row{align-items:flex-start;flex-direction:column}.kpi-grid,.summary-grid,.form-row{grid-template-columns:1fr}.search-panel,.rag-search-row,.chat-form{display:grid;grid-template-columns:1fr}.table{font-size:13px}.table th,.table td{padding:9px}.bubble{max-width:92%}}
+
+/* 社内文書検索の送信中表示 */
+.rag-loading-status:not([hidden]){display:flex;align-items:center;gap:18px;margin:18px 0;padding:20px;border:1px solid #bfdbfe;border-radius:12px;background:#eff6ff;color:#1e40af}
+.rag-loading-status[hidden]{display:none!important}
+.rag-loading-status p{margin:6px 0 0;color:#475569}
+.rag-loading-spinner{width:32px;height:32px;flex-shrink:0;border-radius:50%;animation:ai-spin .8s linear infinite}
+#rag-search-submit:disabled{opacity:.7;cursor:wait}
+@media(prefers-reduced-motion:reduce){.rag-loading-spinner{animation-duration:2s}}
